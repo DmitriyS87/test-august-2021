@@ -1,0 +1,17 @@
+{
+  "name": "test-august-2021",
+  "version": "1.0.0",
+  "description": "jsut a simple app to view data with chart and graph ",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "react",
+    "mobx",
+    "highcharts",
+    "ag-grid"
+  ],
+  "author": "DmitryS87",
+  "license": "ISC"
+}
