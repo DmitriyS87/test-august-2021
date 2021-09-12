@@ -9,8 +9,7 @@ export class ProductStats extends DataModel {
 
     static getProductStats = async function () {
         return await this.fetch(this.url, {
-            method: 'GET',
-            cors: 'no-cors'
+            method: 'GET'
         })
     }
 

@@ -1,81 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
+import React from 'react';
+import { ProductTable } from '../../components/AgTable/AgTable';
+import { observer } from 'mobx-react-lite';
+import { toJS } from 'mobx';
+import { ProductMonthStatsChart } from './ProductMonthStatsChart/ProductMonthStatsChart';
+import Grid from '@material-ui/core/Grid';
+import { StyledDrawPaperWrapper } from './MonthStatsForProduct.styles';
 
-import { ProductStats } from '../../core/api/product';
-import { ProductPropertiesConstant } from '../../constants';
-
-const options = {
-  title: {
-    text: 'Month stats',
-  },
-  series: [
-    {
-      name: 'Jane',
-      data: [1, -20, 4],
-    },
-    {
-      name: 'John',
-      data: [5, 700, 3],
-    },
-  ],
-};
-
-const graphProppertyNames = [
-  ProductPropertiesConstant.MoneySales,
-  ProductPropertiesConstant.CountSales,
-  ProductPropertiesConstant.InStock,
-];
-
-const serializeProductStatsDataToChart = (apiData) => {
-  const result = apiData.reduce(
-    (acc, item) => {
-      graphProppertyNames.forEach((name) => {
-        try {
-          acc[name].push(Number(item[name]));
-        } catch (_err) {
-          acc[name] = [];
-        }
-      });
-      return acc;
-    },
-    {
-      [ProductPropertiesConstant.MoneySales]: [],
-      [ProductPropertiesConstant.CountSales]: [],
-      [ProductPropertiesConstant.InStock]: [],
-    }
-  );
-  return graphProppertyNames.map((name) => ({
-    name,
-    data: result[name],
-  }));
-};
-
-export const MonthStatsForProduct = () => {
-  const [productStats, setProductStats] = useState(null);
-
-  useEffect(() => {
-    (async function fetchData() {
-      const data = await ProductStats.getProductStats();
-      const newData = await data();
-      setProductStats({ 
-        series: serializeProductStatsDataToChart(newData),
-      });
-    })();
-  }, []);
-
-  useEffect(() => {
-    console.log({ ...options, ...productStats });
-  }, [productStats]);
-
-  return productStats ? (
-    <div>
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={{ ...options, ...productStats }}
-      />
-    </div>
+const _MonthStatsForProduct = ({ monthStatsStore }) => {
+  return Array.isArray(monthStatsStore.productStats) ? (
+    <Grid
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      spacing={3}
+    >
+      <Grid item xs={10}>
+        <StyledDrawPaperWrapper>
+          <ProductMonthStatsChart
+            options={[...toJS(monthStatsStore.filtredProductStatsToChart)]}
+          />
+        </StyledDrawPaperWrapper>
+      </Grid>
+      <Grid item xs={10}>
+        <StyledDrawPaperWrapper>
+          <ProductTable
+            rowData={toJS(monthStatsStore.filtredProductStatsForTable)}
+          />
+        </StyledDrawPaperWrapper>
+      </Grid>
+    </Grid>
   ) : (
     <div>loading...</div>
   );
 };
+
+export const MonthStatsForProduct = observer((props) =>
+  _MonthStatsForProduct(props)
+);
